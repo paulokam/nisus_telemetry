@@ -9,14 +9,19 @@
 class Telemetry
 {
 public:
-    Telemetry(Gps *gps, Gyroscope *gyro, Barometer *baro);
+    Telemetry(Gps &gps, Gyroscope &gyro, Barometer &baro);
 
-    void sendData();
+    void getData() const;
+    void sendData() const;
+    bool init();
+    void smartDelay(int val);
 
 private:
-    Gps *_gps;
-    Gyroscope *_gyro;
-    Barometer *_baro;
+    Gps &_gps;
+    Gyroscope &_gyro;
+    Barometer &_baro;
+
+    int baudRate = 9600;
 };
 
 #endif

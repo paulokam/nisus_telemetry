@@ -1,4 +1,4 @@
-#include <Gyroscope.hpp>
+#include <Gyroscope.h>
 #include <gtest/gtest.h>
 
 TEST(test_Gyroscope, isActive_WhenCreatedWithoutParameters_ExpectedTrue){

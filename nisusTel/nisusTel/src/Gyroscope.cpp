@@ -1,113 +1,147 @@
 #include <Gyroscope.h>
+#include <Wire.h>
 
-
-Gyroscope :: Gyroscope(bool activeStatus){
-    this->active = activeStatus;
-    
-    if(this->isActive()){
+Gyroscope ::Gyroscope(bool activeStatus) : active{activeStatus}
+{
+  if (this->isActive())
+  {
     this->_gyroscope = new MPU6050(Wire);
-    // Wire.begin(21,22);
-    // delay(10);
-    this->_gyroscope->begin();
-    delay(1000);
-    this->_gyroscope->calcOffsets(true,true);
+    // this->_gyroscope->calcOffsets(true, true);
   }
 }
 
-Gyroscope :: ~Gyroscope(){
-  delete this->_gyroscope;
+Gyroscope ::~Gyroscope()
+{
+  if (_gyroscope != nullptr)
+  {
+    delete this->_gyroscope;
+  }
 }
 
-bool Gyroscope::isActive() {
+bool Gyroscope::isActive() const
+{
   return this->active;
 }
 
-void Gyroscope::activate() {
-  this->active = true;
+bool Gyroscope::activate()
+{
+  if (!this->isActive())
+  {
+    this->_gyroscope = new MPU6050(Wire);
+    this->active = true;
+    return 1;
+  }
+  else
+    return 0;
 }
 
-
-void Gyroscope::deactivate() {
-  this->active = false;
+bool Gyroscope::deactivate()
+{
+  if (this->isActive())
+  {
+    delete this->_gyroscope;
+    this->active = false;
+    return 1;
+  }
+  else
+    return 0;
 }
 
-void Gyroscope :: update(){
-  if(!this->isActive()){
+bool Gyroscope::init()
+{
+
+  if (!this->isActive())
+  {
+    return 0;
+  }
+
+  else if (this->_gyroscope->begin() != 0)
+  {
+    this->deactivate();
+    return 0;
+  }
+  this->_gyroscope->calcOffsets(true, true);
+
+  return 1;
+}
+
+void Gyroscope ::update()
+{
+  if (!this->isActive())
+  {
     return;
   }
 
   this->_gyroscope->update();
 }
 
-float Gyroscope :: pitch(){
-  if(!this->isActive()){
-    return -1 -1;
+float Gyroscope ::pitch()
+{
+  if (!this->isActive())
+  {
+    return -1 - 1;
   }
 
   return this->_gyroscope->getAngleX();
 }
 
-float Gyroscope :: roll(){
-  if(!this->isActive()){
+float Gyroscope ::roll()
+{
+  if (!this->isActive())
+  {
     return -1;
   }
 
   return this->_gyroscope->getAngleY();
 }
 
-float Gyroscope :: yaw(){
-  if(!this->isActive()){
+float Gyroscope ::yaw()
+{
+  if (!this->isActive())
+  {
     return -1;
   }
 
   return this->_gyroscope->getAngleZ();
 }
 
-float Gyroscope :: accX(){
-  if(!this->isActive()){
+float Gyroscope ::accX()
+{
+  if (!this->isActive())
+  {
     return -1;
   }
 
   return this->_gyroscope->getAccX();
 }
 
-float Gyroscope :: accY(){
-  if(!this->isActive()){
+float Gyroscope ::accY()
+{
+  if (!this->isActive())
+  {
     return -1;
   }
 
   return this->_gyroscope->getAccY();
 }
 
-float Gyroscope :: accZ(){
-  if(!this->isActive()){
+float Gyroscope ::accZ()
+{
+  if (!this->isActive())
+  {
     return -1;
   }
 
   return this->_gyroscope->getAccZ();
 }
 
-void Gyroscope :: getData(float* _pitch, float* _roll, float* _yaw, float* _accX, float* _accY, float* _accZ){
-   if(!this->isActive()){
-    return;
+String Gyroscope ::getData()
+{
+  if (!this->isActive())
+  {
+    return String("");
   }
-  if(_pitch != nullptr){
-    *_pitch = this->pitch();
-  }
-  if(_roll != nullptr){
-    *_roll = this->roll();
-  }
-  if(_yaw != nullptr){
-    *_yaw = this->yaw();
-  }
-  if(_accX != nullptr){
-    *_accX = this->accX();
-  }
-  if(_accX != nullptr){
-    *_accY = this->accY();
-  }
-  if(_accX != nullptr){
-    *_accZ = this->accZ();
-  }
-}
+  String aux = String('X') + String(this->pitch(), 1) + String(";Y") + String(this->roll(), 1) + String(";K") + String(this->accX(), 1) + String(";W") + String(this->accY(), 1) + String(';');
 
+  return aux;
+}

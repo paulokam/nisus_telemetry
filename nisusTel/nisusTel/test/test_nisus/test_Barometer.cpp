@@ -1,4 +1,4 @@
-#include <Barometer.hpp>
+#include <Barometer.h>
 #include <gtest/gtest.h>
 
 TEST(test_Barometer, isActive_WhenCreatedWithoutParameters_ExpectedTrue){

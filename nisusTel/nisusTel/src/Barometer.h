@@ -2,7 +2,6 @@
 #define BAROMETER_HPP
 
 #include <Adafruit_BMP280.h>
-#include <Wire.h>
 
 class Barometer {
     friend class Telemetry;
@@ -12,24 +11,30 @@ class Barometer {
     float _pressure0 = 1013.25;
     bool active;
 
-    const uint8_t chipAdress = 0x76;
+    const uint8_t chipAdress = 118;
+
+    
 
 
   public:
     Barometer(bool activeStatus = true);
     ~Barometer();
 
-    bool isActive();    //Return if sensor is active
+    bool isActive() const;    //Return if sensor is active
+    
     void activate();    //Activate sensor
     void deactivate();    //Deactivate sensor
 
+    bool init();
 
-    float temperature(); //return temperature
-    float pressure(); //return pressure
-    float alt(); //return altitude
+
+    float temperature() const; //return temperature
+    float pressure() const; //return pressure
+    float alt() const; //return altitude
+    
     void setPressure0(float value);
 
-    String getData();//float* _pressure = nullptr, float* _temperature = nullptr, float* _alt = nullptr);
+    String getData() ;//float* _pressure = nullptr, float* _temperature = nullptr, float* _alt = nullptr);
 };
 
 

@@ -1,92 +1,189 @@
 #include <Gps.h>
+#include <Arduino.h>
 
-
-Gps :: Gps(bool activeStatus){
-  this->active = activeStatus;
-  
-  if(this->isActive())
+Gps ::Gps(bool activeStatus) : active{activeStatus}
+{
+  if (this->isActive())
     this->_gps = new TinyGPSPlus;
 }
-
-Gps :: ~Gps() {
-  delete this->_gps;
+Gps ::~Gps()
+{
+  if (_gps != nullptr)
+  {
+    delete this->_gps;
+  }
 }
 
-bool Gps::isActive() {
+bool Gps ::init()
+{
+  if (this->isActive())
+  {
+    Serial1.begin(this->baudRate, SERIAL_8N1, this->RXPin, this->TXPin);
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+void Gps::update()
+{
+  if (this->isActive())
+  {
+    this->_gps->encode(Serial1.read());
+  }
+}
+
+/**
+ * @brief Retorna status do sensor
+ *
+ * @return true se ativado
+ * @return false se desativado
+ */
+bool Gps::isActive() const
+{
   return this->active;
 }
 
-void Gps::activate() {
-  this->active = true;
+/**
+ * @brief Ativa Gps se desativado
+ *
+ */
+void Gps::activate()
+{
+  if (!this->isActive())
+  {
+    this->_gps = new TinyGPSPlus;
+    this->active = true;
+  }
 }
 
-
-void Gps::deactivate() {
-  this->active = false;
+/**
+ * @brief Desativa Gps se ativado
+ *
+ */
+void Gps::deactivate()
+{
+  if (!this->isActive())
+  {
+    delete _gps;
+    this->active = false;
+  }
 }
 
-int Gps :: nSatellites(){
-  if(this->isActive()){
+/**
+ * @brief Retorna número de satélites pareados pelo Gps se ativo
+ *
+ * @return int
+ */
+int Gps ::nSatellites() const
+{
+  if (this->isActive())
+  {
     return this->_gps->satellites.value();
   }
-  else{
+  else
+  {
     return -1;
   }
 }
 
-float Gps :: alt(){
-  if(this->isActive()){
+/**
+ * @brief Retorna altitude lida pelo Gps se ativo
+ *
+ * @return float
+ */
+float Gps ::alt() const
+{
+  if (this->isActive())
+  {
     return this->_gps->altitude.meters();
   }
-  else{
+  else
+  {
     return -1;
   }
 }
 
-float Gps :: speed(){
- if(this->isActive()){
+/**
+ * @brief Retorna velocidade lida pelo Gps se ativo
+ *
+ * @return float
+ */
+float Gps ::speed() const
+{
+  if (this->isActive())
+  {
     return this->_gps->speed.kmph();
   }
-  else{
+  else
+  {
     return -1;
-  } 
+  }
 }
 
-double Gps :: gpsHDOP(){
-  if(this->isActive()){
+/**
+ * @brief Retorna HDOP lido pelo Gps se ativo
+ *
+ * @return double
+ */
+double Gps ::gpsHDOP() const
+{
+  if (this->isActive())
+  {
     return this->_gps->hdop.hdop();
   }
-  else{
+  else
+  {
     return -1;
   }
 }
 
-double Gps :: lat(){
-  if(this->isActive()){
+/**
+ * @brief Retorna latitude lida pelo Gps se ativo
+ *
+ * @return double
+ */
+double Gps ::lat() const
+{
+  if (this->isActive())
+  {
     return this->_gps->location.lat();
   }
-  else{
+  else
+  {
     return -1;
   }
 }
 
-double Gps :: lon(){
-  if(this->isActive()){
+/**
+ * @brief Retorna longitude lida pelo Gps se ativo
+ *
+ * @return double
+ */
+double Gps ::lon() const
+{
+  if (this->isActive())
+  {
     return this->_gps->location.lng();
   }
-  else{
+  else
+  {
     return -1;
   }
 }
 
-//ALTERAR
-String Gps :: getData(){
-   if(!this->isActive()){
+String Gps ::getData() const
+{
+  if (!this->isActive() || this->nSatellites() <= 0)
+  {
     return String("");
   }
 
-  String aux = String('A') + String(this->lat(),3) + String(";O") + String(this->lon(),3) + String(";S") + String(this->speed(),3) + String(";H") + String(this->alt()) 
-            + String(";N") + String(this->nSatellites(),DEC) + String(';');
-  
+  String aux = "";
+
+  String('A') + String(this->lat(), 3) + String(";O") + String(this->lon(), 3) + String(";S") + String(this->speed(), 3) + String(";H") + String(this->alt()) + String(";N") + String(this->nSatellites(), DEC) + String(';');
+
   return aux;
 }

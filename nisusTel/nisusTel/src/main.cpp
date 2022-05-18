@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include <Telemetry.h>
 
-Gps *const gps_false = new Gps(false);
-Barometer *const baro_true = new Barometer(true);
-Gyroscope *const gyro_false = new Gyroscope(false);
-Telemetry tel(gps_false, gyro_false, baro_true);
+Gps gps(true);
+Barometer baro(false);
+Gyroscope gyro(true);
+Telemetry tel(gps, gyro, baro);
 
 void setup()
 {
@@ -16,17 +16,13 @@ void setup()
 
     digitalWrite(LED_BUILTIN, true);
 
-
-    Serial.print("Gps_false:");
-    Serial.println(gps_false->isActive());
-    Serial.print("baro_true:");
-    Serial.println(baro_true->isActive());
-    Serial.print("gyro_true:");
-    Serial.println(gyro_false->isActive());
+    tel.init();
+    delay(1000);
 }
 
 void loop()
 {
+    tel.getData();
     tel.sendData();
-    delay(1000);
+    tel.smartDelay(1000);
 }

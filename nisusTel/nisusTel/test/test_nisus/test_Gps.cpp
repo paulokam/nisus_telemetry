@@ -1,4 +1,4 @@
-#include <Gps.hpp>
+#include <Gps.h>
 #include <gtest/gtest.h>
 
 TEST(test_Gps, isActive_WhenCreatedWithoutParameters_ExpectedTrue){
