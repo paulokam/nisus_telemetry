@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <Arduino.h>
+
 Barometer ::Barometer(bool activeStatus) : active{activeStatus}
 {
   if (this->isActive())
